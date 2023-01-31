@@ -41,16 +41,17 @@ class UserListViewModelTest {
         // when process has started
         coroutineRule.scheduler.runCurrent()
 
-        // then is loading
-        assertEquals(UserListState.Loading, viewModel.state.value)
+        // then
+        assertEquals(true, viewModel.showLoading.value)
         assertEquals(null, viewModel.error.value)
 
         // when advance until coroutine is finished
         coroutineRule.scheduler.advanceUntilIdle()
 
         // then users are displayed
-        assertEquals(UserListState.ShowList(users1), viewModel.state.value)
+        assertEquals(users1, viewModel.usersList.value)
         assertEquals(null, viewModel.error.value)
+        assertEquals(false, viewModel.showLoading.value)
         assertEquals(FETCH_USERS_DELAY, coroutineRule.scheduler.currentTime)
     }
 
@@ -64,7 +65,8 @@ class UserListViewModelTest {
         coroutineRule.scheduler.advanceUntilIdle()
 
         // then
-        assertEquals(UserListState.ShowList(emptyList()), viewModel.state.value)
+        assertEquals(emptyList(), viewModel.usersList.value)
+        assertEquals(false, viewModel.showLoading.value)
         assertEquals(anException, viewModel.error.value)
     }
 
@@ -80,14 +82,15 @@ class UserListViewModelTest {
         coroutineRule.scheduler.runCurrent()
 
         // then is loading
-        assertEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(true, viewModel.showLoading.value)
         assertEquals(null, viewModel.error.value)
 
         // when advance until coroutine is finished
         coroutineRule.scheduler.advanceUntilIdle()
 
         // then users are displayed
-        assertEquals(UserListState.ShowList(users2), viewModel.state.value)
+        assertEquals(users2, viewModel.usersList.value)
+        assertEquals(false, viewModel.showLoading.value)
         assertEquals(null, viewModel.error.value)
         assertEquals(FETCH_USERS_DELAY, coroutineRule.scheduler.currentTime - startTime)
     }
@@ -115,9 +118,7 @@ class UserListViewModelTest {
         coroutineRule.scheduler.advanceUntilIdle()
 
         // then users are displayed
-        val state = viewModel.state.value
-        check(state is UserListState.ShowList)
-        val lastDisplayedUser = state.users.last()
+        val lastDisplayedUser = viewModel.usersList.value.last()
         assertEquals(aName, lastDisplayedUser.name)
         assertEquals(anEmail, lastDisplayedUser.email)
         assertEquals(null, viewModel.error.value)
@@ -131,15 +132,15 @@ class UserListViewModelTest {
         // when
         viewModel.addUser(AddUser("John", "joe@hunt.com"))
 
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.runCurrent()
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.advanceTimeBy(ADD_USER_DELAY)
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.runCurrent()
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.advanceTimeBy(FETCH_USERS_DELAY)
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
     }
 
     @Test
@@ -180,7 +181,8 @@ class UserListViewModelTest {
         coroutineRule.scheduler.advanceUntilIdle()
 
         // then new users are displayed
-        assertEquals(UserListState.ShowList(usersAfterRemoving), viewModel.state.value)
+        assertEquals(usersAfterRemoving, viewModel.usersList.value)
+        assertEquals(false, viewModel.showLoading.value)
         assertEquals(null, viewModel.error.value)
         assertEquals(FETCH_USERS_DELAY + REMOVE_USER_DELAY, coroutineRule.scheduler.currentTime - startTime)
     }
@@ -210,21 +212,23 @@ class UserListViewModelTest {
         // when
         viewModel.removeUser(users1.first().id)
 
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.runCurrent()
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.advanceTimeBy(REMOVE_USER_DELAY)
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.runCurrent()
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
         coroutineRule.scheduler.advanceTimeBy(FETCH_USERS_DELAY)
-        assertNotEquals(UserListState.Loading, viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
     }
 
     private fun givenLoadingUsersHasFinished(users: List<User>): Long {
         userRepository.hasUsers(users)
         coroutineRule.scheduler.advanceUntilIdle()
-        assertEquals(UserListState.ShowList(users), viewModel.state.value)
+        assertEquals(false, viewModel.showLoading.value)
+        assertEquals(users, viewModel.usersList.value)
+        assertEquals(null, viewModel.error.value)
         return coroutineRule.scheduler.currentTime
     }
 }

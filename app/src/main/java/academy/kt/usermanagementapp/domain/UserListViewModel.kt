@@ -15,8 +15,11 @@ import javax.inject.Inject
 class UserListViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _state: MutableStateFlow<UserListState> = MutableStateFlow(UserListState.Loading)
-    val state: StateFlow<UserListState> = _state
+    private val _usersList: MutableStateFlow<List<User>> = MutableStateFlow(emptyList())
+    val usersList: StateFlow<List<User>> = _usersList
+
+    private val _showProgress: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val showLoading: StateFlow<Boolean> = _showProgress
 
     private val _error: MutableStateFlow<Throwable?> = MutableStateFlow(null)
     val error: StateFlow<Throwable?> = _error
@@ -42,7 +45,7 @@ class UserListViewModel @Inject constructor(
     }
 
     fun refresh() {
-        _state.value = UserListState.Loading
+        _showProgress.value = true
         loadUsers()
     }
 
@@ -53,16 +56,9 @@ class UserListViewModel @Inject constructor(
     private fun loadUsers() {
         viewModelScope.launch {
             userRepository.fetchUsers()
-                .onSuccess { _state.value = UserListState.ShowList(it) }
-                .onFailure {
-                    _state.value = UserListState.ShowList(emptyList())
-                    _error.value = it
-                }
+                .onSuccess { _usersList.value = it }
+                .onFailure { _error.value = it }
+            _showProgress.value = false
         }
     }
-}
-
-sealed interface UserListState {
-    object Loading : UserListState
-    data class ShowList(val users: List<User>) : UserListState
 }

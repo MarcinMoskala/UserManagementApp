@@ -1,7 +1,6 @@
 package academy.kt.usermanagementapp
 
 import academy.kt.usermanagementapp.data.network.ApiException
-import academy.kt.usermanagementapp.domain.UserListState
 import academy.kt.usermanagementapp.domain.UserListViewModel
 import academy.kt.usermanagementapp.model.AddUser
 import academy.kt.usermanagementapp.model.User
@@ -41,19 +40,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             UserManagementAppTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    val state by userListViewModel.state.collectAsState()
+                    val usersList by userListViewModel.usersList.collectAsState()
+                    val showLoading by userListViewModel.showLoading.collectAsState()
                     val error by userListViewModel.error.collectAsState()
 
                     ErrorDialog(error, userListViewModel::hideError)
 
-                    when (val state = state) {
-                        is UserListState.Loading -> ProgressIndicator()
-                        is UserListState.ShowList -> UserList(
-                            state.users,
-                            removeUser = userListViewModel::removeUser,
-                            refresh = userListViewModel::refresh,
-                            addUser = userListViewModel::addUser
-                        )
+                    UserList(
+                        usersList,
+                        removeUser = userListViewModel::removeUser,
+                        refresh = userListViewModel::refresh,
+                        addUser = userListViewModel::addUser
+                    )
+
+                    if (showLoading) {
+                        ProgressIndicator()
                     }
                 }
             }
