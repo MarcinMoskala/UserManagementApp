@@ -37,9 +37,9 @@ class FakeDelayedUserRepository : UserRepository {
     }
 
     companion object {
-        val FETCH_USERS_DELAY = 123L
-        val REMOVE_USER_DELAY = 234L
-        val ADD_USER_DELAY = 345L
-        private val DEFAULT_STATUS = "active"
+        const val FETCH_USERS_DELAY = 123L
+        const val REMOVE_USER_DELAY = 234L
+        const val ADD_USER_DELAY = 345L
+        private const val DEFAULT_STATUS = "active"
     }
 }

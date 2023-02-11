@@ -47,10 +47,7 @@ class MainActivity : ComponentActivity() {
                     ErrorDialog(error, userListViewModel::hideError)
 
                     UserList(
-                        usersList,
-                        removeUser = userListViewModel::removeUser,
-                        refresh = userListViewModel::refresh,
-                        addUser = userListViewModel::addUser
+                        usersList, removeUser = userListViewModel::removeUser, refresh = userListViewModel::refresh, addUser = userListViewModel::addUser
                     )
 
                     if (showLoading) {
@@ -65,9 +62,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun ProgressIndicator() {
     Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator()
     }
@@ -83,48 +78,34 @@ private fun UserList(users: List<User>, removeUser: (Int) -> Unit, refresh: () -
     RemoveUserDialog(activeRemoveUser, setActiveRemoveUser, removeUser)
     AddUserDialog(activeAddUser, setActiveAddUser, addUser)
 
-    Scaffold(topBar = { },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { setActiveAddUser(true) }
-            ) {
-                Icon(Icons.Rounded.Add, "Add user")
-            }
-        },
-        content = { padding ->
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(false),
-                onRefresh = { refresh() },
-            ) {
-                Surface(modifier = Modifier.padding(padding)) {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(items = users) { user ->
-                            Card(
-                                shape = RoundedCornerShape(4.dp),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = 4.dp
-                                ),
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth()
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onLongPress = { setActiveRemoveUser(user) }
-                                        )
-                                    }
-                            ) {
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(user.name, style = MaterialTheme.typography.titleMedium)
-                                    Text(user.email, style = MaterialTheme.typography.bodyMedium)
-                                    Text("The status is ${user.status}", style = MaterialTheme.typography.labelMedium)
-                                }
+    Scaffold(topBar = { }, floatingActionButton = {
+        FloatingActionButton(onClick = { setActiveAddUser(true) }) {
+            Icon(Icons.Rounded.Add, "Add user")
+        }
+    }, content = { padding ->
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(false),
+            onRefresh = { refresh() },
+        ) {
+            Surface(modifier = Modifier.padding(padding)) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(items = users) { user ->
+                        Card(shape = RoundedCornerShape(4.dp), elevation = CardDefaults.cardElevation(
+                            defaultElevation = 4.dp
+                        ), modifier = Modifier.padding(16.dp).fillMaxWidth().pointerInput(Unit) {
+                            detectTapGestures(onLongPress = { setActiveRemoveUser(user) })
+                        }) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text(user.name, style = MaterialTheme.typography.titleMedium)
+                                Text(user.email, style = MaterialTheme.typography.bodyMedium)
+                                Text("The status is ${user.status}", style = MaterialTheme.typography.labelMedium)
                             }
                         }
                     }
                 }
             }
         }
-    )
+    })
 }
 
 @Composable
@@ -169,38 +150,21 @@ private fun AddUserDialog(activeAddUser: Boolean, setActiveAddUser: (Boolean) ->
                 modifier = Modifier.padding(8.dp),
             ) {
                 Column(
-                    Modifier
-                        .background(White)
+                    Modifier.background(White)
                 ) {
                     var name by remember { mutableStateOf("") }
                     var email by remember { mutableStateOf("") }
 
                     Text(
-                        text = "Fill user data",
-                        modifier = Modifier.padding(8.dp),
-                        fontSize = 20.sp
+                        text = "Fill user data", modifier = Modifier.padding(8.dp), fontSize = 20.sp
                     )
 
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        modifier = Modifier.padding(8.dp),
-                        label = { Text("User name") }
-                    )
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        modifier = Modifier.padding(8.dp),
-                        label = { Text("User email") }
-                    )
+                    OutlinedTextField(value = name, onValueChange = { name = it }, modifier = Modifier.padding(8.dp), label = { Text("User name") })
+                    OutlinedTextField(value = email, onValueChange = { email = it }, modifier = Modifier.padding(8.dp), label = { Text("User email") })
 
                     Row {
                         OutlinedButton(
-                            onClick = { setActiveAddUser(false) },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .weight(1F)
+                            onClick = { setActiveAddUser(false) }, Modifier.fillMaxWidth().padding(8.dp).weight(1F)
                         ) {
                             Text(text = "Cancel")
                         }
@@ -209,11 +173,7 @@ private fun AddUserDialog(activeAddUser: Boolean, setActiveAddUser: (Boolean) ->
                             onClick = {
                                 addUser(AddUser(name, email))
                                 setActiveAddUser(false)
-                            },
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                                .weight(1F)
+                            }, Modifier.fillMaxWidth().padding(8.dp).weight(1F)
                         ) {
                             Text(text = "Add")
                         }

@@ -28,7 +28,7 @@ class UserListViewModelTest {
     private lateinit var viewModel: UserListViewModel
 
     @Before
-    fun setUp() {
+    fun setup() {
         userRepository = FakeDelayedUserRepository()
         viewModel = UserListViewModel(userRepository)
     }
