@@ -1,7 +1,7 @@
 package academy.kt.usermanagementapp
 
 import academy.kt.usermanagementapp.data.network.ApiException
-import academy.kt.usermanagementapp.domain.UserListViewModel
+import academy.kt.usermanagementapp.ui.theme.UserListViewModel
 import academy.kt.usermanagementapp.model.AddUser
 import academy.kt.usermanagementapp.model.User
 import academy.kt.usermanagementapp.ui.theme.UserManagementAppTheme
